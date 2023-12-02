@@ -7,7 +7,7 @@ import { ChatService } from './chat.service';
 import { UpdateChatDto } from './dto/update-chat.dto';
 import { BroadcastMessageDto } from './dto/broadcast.message.dto';
 
-@WebSocketGateway(8080)
+@WebSocketGateway(40021)
 export class ChatGateway {
   @WebSocketServer()
   server: Server;
