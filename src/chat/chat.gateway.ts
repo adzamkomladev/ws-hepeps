@@ -1,42 +1,35 @@
-import { WebSocketGateway,WebSocketServer, SubscribeMessage, MessageBody } from '@nestjs/websockets';
+import { Logger } from '@nestjs/common';
+import { WebSocketGateway, WebSocketServer, SubscribeMessage, WsResponse, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
 
 import { Server } from 'ws';
-import { from, map } from 'rxjs';
+import { Observable, from, map, of } from 'rxjs';
 
 import { ChatService } from './chat.service';
-import { UpdateChatDto } from './dto/update-chat.dto';
 import { BroadcastMessageDto } from './dto/broadcast.message.dto';
 
 @WebSocketGateway(40021)
-export class ChatGateway {
+export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+  private readonly logger = new Logger(ChatGateway.name);
+
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly chatService: ChatService) {}
+  constructor(private readonly chatService: ChatService) { }
 
-  @SubscribeMessage('events')
-  create(client: any, data: BroadcastMessageDto) {
-    console.log(data, 'suckers');
-    return from([1, 2, 3]).pipe(map(item => ({ event: 'events', data: item })));
+  afterInit(server: any): void {
+    this.logger.log('Init');
   }
 
-  @SubscribeMessage('findAllChat')
-  findAll() {
-    return this.chatService.findAll();
+  handleDisconnect(client: any): void {
+    this.logger.log(`Client disconnected: ${client.id}`);
   }
 
-  @SubscribeMessage('findOneChat')
-  findOne(@MessageBody() id: number) {
-    return this.chatService.findOne(id);
+  handleConnection(client: any, ...args: any[]): void {
+    this.logger.log(`Client connected: `,);
   }
 
-  @SubscribeMessage('updateChat')
-  update(@MessageBody() updateChatDto: UpdateChatDto) {
-    return this.chatService.update(updateChatDto.id, updateChatDto);
-  }
-
-  @SubscribeMessage('removeChat')
-  remove(@MessageBody() id: number) {
-    return this.chatService.remove(id);
+  @SubscribeMessage('send-message')
+  create(client: any, data: BroadcastMessageDto): Observable<WsResponse<BroadcastMessageDto>> {
+    return of({ event: 'received-message', data });
   }
 }
