@@ -1,38 +1,29 @@
 <html>
-  <head>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-  </head>
 
-  <body>
+<head>
+  <!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
+</head>
 
-    <button>Send Message</button>
-    <div id="app">{{ message }}</div>
-    <script>
-         const { createApp } = Vue
+<body>
+  <script>
 
-createApp({
-  data() {
-    return {
-      message: 'Hello Vue!'
-    }
-  }
-}).mount('#app')
-        const socket = new WebSocket('ws://localhost:40021');
-        socket.onopen = function() {
-          console.log('Connected');
-          socket.send(
-            JSON.stringify({
-              event: 'send-message',
-              data: {
-                  user: "Francis",
-                  message: 'I am a man ooo bro'
-              },
-            }),
-          );
-          socket.onmessage = function(data) {
-            console.log(data);
-          };
-        };
-      </script>
-  </body>
+    const socket = new WebSocket('ws://hepeps.yebi.africa:40022');
+    socket.onopen = function () {
+      console.log('Connected');
+      socket.send(
+        JSON.stringify({
+          event: 'send-message',
+          data: {
+            user: "Francis",
+            message: 'This is a cool test'
+          },
+        }),
+      );
+      socket.onmessage = function (data) {
+        console.log(data);
+      };
+    };
+  </script>
+</body>
+
 </html>
